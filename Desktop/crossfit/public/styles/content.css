@@ -1,0 +1,34 @@
+
+    /* Custom styles for the datepicker */
+    .datepicker-dropdown {
+      font-family: 'Poppins', sans-serif; /* Apply the custom font to the datepicker dropdown */
+    }
+
+    .datepicker table {
+      font-size: 12px; /* Adjust the font size of the datepicker */
+    }
+
+    .datepicker th,
+    .datepicker td {
+      width: 30px; /* Adjust the width of the datepicker cells */
+      height: 30px; /* Adjust the height of the datepicker cells */
+    }
+
+    /* Custom styles for the datepicker */
+    .ui-datepicker-buttonpane {
+      display: flex; /* Use flexbox for button positioning */
+      justify-content: space-between; /* Space buttons evenly */
+      margin-top: 10px; /* Adjust top margin as needed */
+    }
+
+    .ui-datepicker-current,
+    .ui-datepicker-close {
+      flex: 1; /* Expand to fill available space */
+    }
+   
+
+    #successModal {
+     display: flex;
+      align-items: center;
+    justify-content: center;
+}
