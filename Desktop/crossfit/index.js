@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import pg from "pg";
 import axios from "axios";
 
+
 const app = express();
 const port = 3000;
 
@@ -16,6 +17,7 @@ const db = new pg.Client({
 });
 
 db.connect();
+
 
 // Parse JSON bodies
 app.use(express.json());
@@ -69,7 +71,7 @@ app.get('/log', async (req, res) => {
     const users = usersResult.rows;
 
     // Fetch exercise data from the database
-    const exercisesResult = await db.query("SELECT * FROM exercises");
+    const exercisesResult = await db.query("SELECT * FROM exercises ORDER BY exercise_name ASC");
     const exercises = exercisesResult.rows;
 
     // Render the log page and pass data to the template
@@ -127,7 +129,7 @@ app.delete('/delete-log/:logId', async (req, res) => {
 app.get('/manage-users', async (req, res) => {
   try {
     // Fetch user data from the database
-    const usersResult = await db.query("SELECT * FROM users");
+    const usersResult = await db.query("SELECT * FROM users ORDER BY name ASC");
     const users = usersResult.rows;
 
     // Render the manage users page and pass data to the template
@@ -138,15 +140,46 @@ app.get('/manage-users', async (req, res) => {
   }
 });
 
+// Route to handle the form submission for adding exercise
+app.post('/add-user', async (req, res) => {
+  try {
+    console.log(req.body); // Log the entire request body
+
+    const userName = req.body.addUserName;
+    const userAge = req.body.addUserAge;
+    const userWeight = req.body.addUserWeight;
+    console.log('User Name:', userName, 'User Age:',userAge,'User Weight:',userWeight);
+
+    // Add the data to the database
+    const insertQuery = `
+      INSERT INTO users(name,age,weight)
+      VALUES ($1,$2,$3)
+      RETURNING id, name,age,weight;`;
+
+    const result = await db.query(insertQuery, [userName,userAge,userWeight]);
+
+    // Fetch all users from the database again
+    const usersResult = await db.query("SELECT * FROM users ORDER BY name ASC");
+    const users = usersResult.rows;
+
+    // Render the 'manage-users.ejs' template with the updated list of exercises
+    res.render('manage-users.ejs', { users });
+  } catch (error) {
+    console.error(error);
+
+    // Render an error page or handle the error as needed
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
 
 // Add a route for updating users
 app.post('/update-user/:userId', async (req, res) => {
 
   try{
   const userId = req.params.userId;
-  const updatedName = req.body.updatedName;
-  const updatedAge = req.body.updatedAge;
-  const updatedWeight = req.body.updatedWeight;
+  const updatedUserName = req.body.updatedUserName;
+  const updatedUserAge = req.body.updatedUserAge;
+  const updatedUserWeight = req.body.updatedUserWeight;
 
   const updateQuery = `
       UPDATE users
@@ -154,20 +187,43 @@ app.post('/update-user/:userId', async (req, res) => {
       WHERE id = $4
     `;
 
-    await db.query(updateQuery, [updatedName,updatedAge, updatedWeight,userId]); 
-    
-  } catch (error) {
+    await db.query(updateQuery, [updatedUserName,updatedUserAge, updatedUserWeight,userId]); 
+
+      res.redirect('/manage-users');
+  } 
+
+  catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 });
 
+// Add a route for deleting users
+app.delete('/delete-user/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    // Add logic to delete the exercise with the given exerciseId from the database
+    const deleteQuery = 'DELETE FROM users WHERE id = $1';
+    await db.query(deleteQuery, [userId]);
+
+    // Respond with a success status
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting user', error);
+    // Log the error details more explicitly
+    console.log('Error Status:', error.status);
+    console.log('Error Message:', error.message);
+    // Handle the error and send an appropriate response
+    res.status(500).json({ error: 'Internal Server Error', details: error.message });
+  }
+});
 
 // Route to render the manage exercises page
 app.get('/manage-exercises', async (req, res) => {
   try {
     // Fetch user data from the database
-    const exercisesResult = await db.query("SELECT * FROM exercises");
+    const exercisesResult = await db.query("SELECT * FROM exercises ORDER BY exercise_name ASC");
     const exercises = exercisesResult.rows;
 
     // Render the manage users page and pass data to the template
@@ -177,6 +233,7 @@ app.get('/manage-exercises', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 // Route to handle the form submission for adding exercise
 app.post('/add-exercise', async (req, res) => {
@@ -200,7 +257,7 @@ app.post('/add-exercise', async (req, res) => {
     const result = await db.query(insertQuery, [exerciseName]);
 
     // Fetch all exercises from the database again
-    const exercisesResult = await db.query("SELECT * FROM exercises");
+    const exercisesResult = await db.query("SELECT * FROM exercises ORDER BY exercise_name ASC");
     const exercises = exercisesResult.rows;
 
     // Render the 'manage-exercises.ejs' template with the updated list of exercises
@@ -247,16 +304,19 @@ app.delete('/delete-exercise/:exerciseId', async (req, res) => {
     const deleteQuery = 'DELETE FROM exercises WHERE id = $1';
     await db.query(deleteQuery, [exerciseId]);
 
-    // Redirect to the manage-exercises page after successful deletion
-    res.redirect('/manage-exercises');
+    // Respond with a success status
+    res.status(204).send();
   } catch (error) {
-    console.error(error);
+    console.error('Error deleting exercise', error);
+    // Log the error details more explicitly
+    console.log('Error Status:', error.status);
+    console.log('Error Message:', error.message);
     // Handle the error and send an appropriate response
     res.status(500).json({ error: 'Internal Server Error', details: error.message });
   }
 });
 
-// Route to render progress overview of all the exercise logs
+
 app.get('/progress-overview', async (req, res) => {
   try {
     const filterByName = req.query.filterByName;
@@ -319,6 +379,118 @@ app.get('/progress-overview', async (req, res) => {
   }
 });
 
+app.get('/user-progress', async (req, res) => {
+  try {
+    const filterByName = req.query.filterByName;
+    const filterByExercise = req.query.filterByExercise;
+
+   const conditions = [];
+const parameters = [];
+
+if (filterByName) {
+  conditions.push(`users.name ILIKE $1`);
+  parameters.push([`%${filterByName}%`, 'text']);
+}
+
+if (filterByExercise) {
+  conditions.push(`exercises.exercise_name ILIKE $2`);
+  parameters.push(`%${filterByExercise}%`);
+}
+
+const query = `
+  SELECT
+    exercise_logs.log_id,
+    users.name AS user_name,
+    exercise_logs.exercise_date,
+    exercises.exercise_name,
+    exercise_logs.exercise_weight
+  FROM exercise_logs
+  JOIN users ON exercise_logs.user_id = users.id
+  JOIN exercises ON exercise_logs.exercise_id = exercises.id
+  ${conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : ''}
+`;
+
+   
+    // Query to get distinct user names for the dropdown
+    const userNamesQuery = 'SELECT DISTINCT name FROM users';
+    const userNamesResult = await db.query(userNamesQuery);
+    const userList = userNamesResult.rows.map(row => row.name);
+
+    // Query to get distinct exercise names for the dropdown
+    const exerciseNamesQuery = 'SELECT DISTINCT exercise_name FROM exercises';
+    const exerciseNamesResult = await db.query(exerciseNamesQuery);
+    const exerciseList = exerciseNamesResult.rows.map(row => row.exercise_name);
+
+    console.log('Query:', query);
+    console.log('Parameters:', parameters);
+
+    const userProgress = await db.query(query, parameters);
+    userProgress.rows.forEach((log) => {
+      log.exercise_date = log.exercise_date.toDateString(); // Convert to a string format
+    });
+
+ // Render the Progress Overview page and pass data to the template
+    res.render('user-progress.ejs', { userProgress:userProgress.rows, userList,exerciseList});
+    // console.log(progressOverview)
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'Internal Server Error', details: error.message });
+  }
+});
+
+app.get('/user-progress-json', async (req, res) => {
+  try {
+    const filterByName = req.query.filterByName;
+    const filterByExercise = req.query.filterByExercise;
+
+    // Use an array to store conditions
+    const conditions = [];
+    const parameters = [];
+
+    if (filterByName) {
+      conditions.push(`users.name ILIKE $${parameters.length + 1}`);
+      parameters.push(`%${filterByName}%`);
+    }
+
+    if (filterByExercise) {
+      conditions.push(`exercises.exercise_name ILIKE $${parameters.length + 1}`);
+      parameters.push(`%${filterByExercise}%`);
+    }
+
+    const query = `
+      SELECT
+        exercise_logs.log_id,
+        users.name AS user_name,
+        exercise_logs.exercise_date,
+        exercises.exercise_name,
+        exercise_logs.exercise_weight
+      FROM exercise_logs
+      JOIN users ON exercise_logs.user_id = users.id
+      JOIN exercises ON exercise_logs.exercise_id = exercises.id
+     
+    `;
+
+    // Query to get distinct user names for the dropdown
+    const userNamesQuery = 'SELECT DISTINCT name FROM users';
+    const userNamesResult = await db.query(userNamesQuery);
+    // const userList = userNamesResult.rows.map(row => row.name);
+
+    // Query to get distinct exercise names for the dropdown
+    const exerciseNamesQuery = 'SELECT DISTINCT exercise_name FROM exercises';
+    const exerciseNamesResult = await db.query(exerciseNamesQuery);
+    // const exerciseList = exerciseNamesResult.rows.map(row => row.exercise_name);
+
+    const userProgress = await db.query(query, parameters);
+    userProgress.rows.forEach((log) => {
+      log.exercise_date = log.exercise_date
+    });
+
+     res.json(userProgress);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 
 app.get("/dashboard", (req, res) => {

@@ -111,40 +111,31 @@
   </div>
 </form>
 
-<div class="modal" tabindex="-1" id="successModal" hidden>
-  <div class="modal-dialog  modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body">
-        <p>Data updated successfully!</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
 
 <%- include("partials/footer.ejs") %>
 
 <script>
 
- $(document).ready(function () {
-   // Handle form submission for add
-  $('form[id^="addExerciseForm"]').submit(function (event) {
-    // Log the entire form data
-    console.log('Form Data:', $(this).serialize());
+  $(document).ready(function () {
+  // Handle form submission for add
+$('#addExerciseForm').submit(function (event) {
+  event.preventDefault(); // Prevent the default form submission
 
-    // No need to prevent the default form submission
-    // The form will be submitted traditionally, and the browser will handle redirection
-
-    // Optional: Add any client-side validation if needed
-
-    // You can still perform some actions after the form submission
-    // For example, show a success message
-    $('#successModal').modal('show');
+  // Make an AJAX request to submit the form data
+  $.ajax({
+    url: '/add-exercise',
+    method: 'POST',
+    data: $('#addExerciseForm').serialize(), // Serialize form data
+    success: function (data) {
+      // Redirect to the 'manage-users' page after successful submission
+      window.location.href = '/manage-exercises';
+    },
+    error: function (error) {
+      console.error('Error adding exercise', error);
+      // Handle errors here
+    }
   });
+});
 
   // Handle form submission for update
   $('form[id^="updateExerciseForm"]').submit(function (event) {
@@ -190,23 +181,6 @@
       deleteExercise(exerciseId);
     });
   }
-    // Handle the click on the "Delete" button
-    $('[data-bs-target="#confirmDeleteModal"]').on('click', function() {
-      // Set the exercise ID dynamically based on the clicked button
-      var exerciseId = $(this).data('exercise-id');
-
-      // Show the confirmation modal
-      $('#confirmDeleteModal').modal('show');
-
-      // Handle the click on the "Delete" button inside the modal
-      $('#confirmDeleteButton').off('click').on('click', function() {
-        // Close the modal
-        $('#confirmDeleteModal').modal('hide');
-
-        // Perform the delete operation
-        deleteExercise(exerciseId);
-      });
-    });
   
   // Function to actually delete the exercise
   function deleteExercise(exerciseId) {
