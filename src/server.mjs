@@ -8,6 +8,7 @@ import workoutsRoutes from './routes/workouts.mjs';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { authenticateToken } from './routes/authMiddleware.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,7 +44,9 @@ app.use(
 
 app.use('/api/users', usersRoutes);
 app.use('/api/login', usersRoutes);
-app.use('/api', workoutsRoutes);
+app.use('/api/logs', authenticateToken, workoutsRoutes);
+app.use('/api/', workoutsRoutes);
+
 
 
 app.get('*', (req, res) => {

@@ -7,7 +7,6 @@ import SignUp from './SignUp';
 import Login from './Login';
 import Home from './Home';
 import Logs from './Logs';
-import StrengthLogs from './StrengthLogs';
 import { orange } from '@mui/material/colors';
 import { createTheme, ThemeProvider } from '@mui/material';
 
@@ -35,11 +34,11 @@ function App() {
       <main>
          {/* Define the root route "/" */}
             <Routes>
-              <Route path="/" element={<Home/>} > </Route>
+              {/* <Route path="/" element={<Home/>} > </Route> */}
               <Route path ="/SignUp" element ={<SignUp/>}> </Route>
-              <Route path ="/Login" element ={<Login/>}> </Route>
+              <Route path ="/" element ={<Login/>}> </Route>
               <Route path ="/Logs" element ={<Logs/>}> </Route>
-              <Route path ="/Logs-strength" element ={<StrengthLogs/>}> </Route>
+            
            
             </Routes>
       </main>

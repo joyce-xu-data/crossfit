@@ -1,9 +1,11 @@
 import express from 'express';
 import { db } from '../server.mjs';
+import { authenticateToken } from './authMiddleware.mjs';
+
 
 const router = express.Router();
 
-router.get('/categories', async (req, res) => {
+router.get('/categories',async (req, res) => {
   try {
     const categories = await db.query('SELECT * FROM categories');
     res.json(categories.rows);
@@ -44,10 +46,50 @@ router.get('/categories/:categoryId/workouts', async (req, res) => {
   }
 });
 
-router.post('/api/logs', async (req, res) => {
-  const logData = req.body;
-  await db.createLog(logData);
-  res.status(201).json({ message: 'Log created successfully' });
+
+router.post('/logs',authenticateToken, async (req, res) => {
+  // Access the logged-in user's ID
+  const userId = req.user.id;
+  
+
+  // Extract log data from the request body
+  const { logEntries, notes } = req.body;
+
+
+  try {
+    // Begin a transaction
+    await db.query('BEGIN');
+
+    const insertQuery = `
+      INSERT INTO workout_logs (
+        workoutdate, strengthorwod, strengthwork, solopartner, workouttype,
+        rxscaled, workout_id, qty, scoremetrics, weight, weightunit,
+        minutes, seconds, reps, rounds, user_id, notes
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+    `;
+    console.log(insertQuery)
+
+    for (const entry of logEntries) {
+      const values = [
+        entry.workoutDate, entry.strengthOrWOD, entry.strengthWork, entry.soloPartner, entry.workoutType,
+        entry.rxscaled, entry.workoutId, entry.qty, entry.scoreMetrics, entry.weight, entry.weightUnit,
+        entry.minutes, entry.seconds, entry.reps, entry.rounds, userId, notes
+      ];
+      
+      console.log(values)
+      await db.query(insertQuery, values);
+    }
+
+    // Commit the transaction
+    await db.query('COMMIT');
+    res.status(201).json({ message: 'Logs created successfully' });
+  } catch (error) {
+    // If an error is caught, rollback the transaction
+    await db.query('ROLLBACK');
+    console.error("Failed to insert log entries:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
+
 
 export default router;

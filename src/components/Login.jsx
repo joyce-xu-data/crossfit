@@ -12,47 +12,51 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from './UserContext';
 
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useUser();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitStatus, setSubmitStatus] = useState('');
 
-  const handleSubmit = async(event) => {
-    event.preventDefault();
-   
-  
-   // Construct the loginDetails object
-    const loginDetails = {
-      email: email,
-      password: password,
-    };
-    console.log(loginDetails)
+  const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  const loginDetails = {
+    email: email,
+    password: password,
+  };
 
   try {
     const response = await fetch('api/users/login', {
-      method:'POST',
-      headers:{
-        'content-Type': 'application/json',
-      }, 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(loginDetails),
-    })
+    });
 
-    if (response.ok){
-       // Handle successful submission, e.g., navigate to login page or show success message
-        setSubmitStatus('Successful!')
-        navigate('/');
-    } else{
-      // Handle errors (e.g., show an error message)
-        console.error('Login failed');
-    } 
-  } catch (error){
-     console.error('Network error', error);
+    const data = await response.json();
+
+    if (response.ok) {
+      // Pass the user data and the token to the login function in your context
+      login(data.user, data.token);
+
+      // Navigate to the logs page
+      navigate('/logs');
+    } else {
+      // Handle errors, such as showing an error message
+      setSubmitStatus(data.message || 'Login failed');
+    }
+  } catch (error) {
+    // Handle network errors
+    setSubmitStatus('Network error, please try again later.');
   }
-  
-  };
+};
+
 
   return (
   

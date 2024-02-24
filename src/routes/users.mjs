@@ -3,6 +3,7 @@ import express from 'express';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { db } from '../server.mjs';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router ();
 
@@ -60,6 +61,20 @@ async (req, email, password, done) => {
   }
 }));
 
+// Serialize user to the session
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+// Deserialize user from the session
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await db.query('SELECT * FROM userdb WHERE id = $1', [id]);
+    done(null, user.rows[0]);
+  } catch (error) {
+    done(error, null);
+  }
+});
 
 // POST route to register a user
 router.post('/', (req, res, next) => {
@@ -88,12 +103,9 @@ router.post('/login', (req, res, next) => {
       if (loginErr) {
         return res.status(500).json({ error: 'Error logging in', details: loginErr.message });
       }
-      // Here you would typically issue a token or set a cookie
-      // For example, using JWT:
-      // const token = jwt.sign(user, 'your_jwt_secret');
-      // res.status(200).json({ user, token });
-      // But for now, we'll just return success.
-      return res.status(200).json({ message: 'Logged in successfully', user });
+      // Issue a JWT
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+      return res.status(200).json({ message: 'Logged in successfully', user, token });
     });
   })(req, res, next);
 });
