@@ -46,7 +46,7 @@ function Login() {
       login(data.user, data.token);
 
       // Navigate to the logs page
-      navigate('/logs');
+      navigate('/milestone');
     } else {
       // Handle errors, such as showing an error message
       setSubmitStatus(data.message || 'Login failed');

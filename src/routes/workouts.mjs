@@ -91,5 +91,69 @@ router.post('/logs',authenticateToken, async (req, res) => {
   }
 });
 
+router.get('/workouts/:workoutId/details', authenticateToken, async (req, res) => {
+   const { workoutId } = req.params; // Correct way to access route params
+
+  try {
+    const result = await db.query(`
+     SELECT * FROM workout_logs WHERE workout_id = $1 
+    `, [workoutId]);
+
+
+    if (result.rows.length > 0) {
+      // Optionally log the max weight found
+      console.log(`Data found for workoutId ${workoutId}`);
+      
+      res.json(result.rows[0]);
+    } else {
+      console.log(`No data found for workoutId ${workoutId}`);
+      res.status(404).json({ error: "No data found for the specified workout_id" });
+    }
+  } catch (error) {
+    console.error("Failed to fetch data for workout", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get('/workouts/:workoutId/maxweight', authenticateToken, async (req, res) => {
+  const { workoutId } = req.params;
+  
+  console.log(`Fetching max weight for workoutId: ${workoutId}`);
+  
+  try {
+    // Adjust the query to fetch max weights for specific quantities
+    const result = await db.query(`
+      SELECT
+        workout_id,
+        MAX(CASE WHEN qty = 1 THEN weight ELSE NULL END) as max_weight_qty_1,
+        MAX(CASE WHEN qty = 3 THEN weight ELSE NULL END) as max_weight_qty_3,
+        MAX(CASE WHEN qty = 5 THEN weight ELSE NULL END) as max_weight_qty_5,
+        MAX(CASE WHEN qty = 10 THEN weight ELSE NULL END) as max_weight_qty_10
+      FROM workout_logs
+      WHERE workout_id = $1
+      GROUP BY workout_id
+    `, [workoutId]);
+
+    console.log(`Database query result for workoutId ${workoutId}:`, result.rows);
+
+    if (result.rows.length > 0) {
+    const maxWeights = result.rows[0];
+    console.log(`Max weights found for workoutId ${workoutId}:`);
+    console.log(`Qty 1: ${maxWeights.max_weight_qty_1 || 'N/A'} kg`);
+    console.log(`Qty 3: ${maxWeights.max_weight_qty_3 || 'N/A'} kg`);
+    console.log(`Qty 5: ${maxWeights.max_weight_qty_5 || 'N/A'} kg`);
+    console.log(`Qty 10: ${maxWeights.max_weight_qty_10 || 'N/A'} kg`);
+      res.json(result.rows[0]);
+    } else {
+      console.log(`No data found for workoutId ${workoutId}`);
+      res.status(404).json({ error: "No data found for the specified workout_id" });
+    }
+  } catch (error) {
+    console.error("Failed to fetch maximum weight for workout", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+
 
 export default router;

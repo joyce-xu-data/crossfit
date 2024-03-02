@@ -5,8 +5,8 @@ import Footer from './Footer';
 import { UserProvider } from './UserContext';
 import SignUp from './SignUp';
 import Login from './Login';
-import Home from './Home';
 import Logs from './Logs';
+import Milestone from './Milestone';
 import { orange } from '@mui/material/colors';
 import { createTheme, ThemeProvider } from '@mui/material';
 
@@ -38,6 +38,7 @@ function App() {
               <Route path ="/SignUp" element ={<SignUp/>}> </Route>
               <Route path ="/" element ={<Login/>}> </Route>
               <Route path ="/Logs" element ={<Logs/>}> </Route>
+              <Route path ="/Milestone" element ={<Milestone/>}> </Route>
             
            
             </Routes>
