@@ -42,4 +42,4 @@ Guidelines on how to contribute to the app development.
 
 ## License
 State the license under which this app is released.
->>>>>>> 2a73d5b9840799015f8dd2646c8718c7acf258e3
+
