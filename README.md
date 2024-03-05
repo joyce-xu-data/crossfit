@@ -1,6 +1,4 @@
-License
-State the license under which this app is released.
-=======
+
 # CrossFit Companion Web Application
 
 Explore CrossFit Companion: The ultimate web app designed to assist beginners with their Crossfit journey. Embracing the philosophy that CrossFit is scalable to all levels, we aim to offer a beginner friendly platform to start your rewarding CrossFit journey with confidence and support. The web app offers a range of tools from workout logging to a chatbot for FAQs, all aimed at making the start of your fitness path as smooth as possible.
