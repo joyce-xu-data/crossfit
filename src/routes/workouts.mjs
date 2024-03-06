@@ -154,6 +154,44 @@ router.get('/workouts/:workoutId/maxweight', authenticateToken, async (req, res)
   }
 });
 
+router.get('/workouts/:workoutId/chart-data', async (req, res) => {
+  const { workoutId } = req.params; 
+
+  try {
+    const result = await db.query(`
+      SELECT workoutDate, weight 
+      FROM workout_logs 
+      WHERE workout_id = $1 
+      ORDER BY weight ASC, workoutDate ASC
+    `, [workoutId]);
+
+    if (result.rows.length > 0) {
+      // Convert the fetched data into chart format
+      const labels = result.rows.map(row => new Date(row.workoutdate).toLocaleDateString()); // Format dates for labels
+      const weights = result.rows.map(row => row.weight);
+
+      const chartData = {
+        labels: labels,
+        datasets: [{
+          label: 'Weight Progression',
+          data: weights,
+          borderColor: 'rgb(75, 192, 192)',
+          tension: 0.1
+        }]
+      };
+
+      console.log(`Chart data prepared for workoutId ${workoutId}`, chartData);
+      res.json(chartData); // Return the chart data
+    } else {
+      console.log(`Weights API: No data found for workoutId ${workoutId}`);
+      res.status(404).json({ error: "No data found for the specified workout_id" });
+    }
+  } catch (error) {
+    console.error("Failed to fetch or process data for workout", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 
 export default router;
+
