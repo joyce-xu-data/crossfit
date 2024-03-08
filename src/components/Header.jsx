@@ -152,7 +152,11 @@ function Header() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem 
+                key={setting} 
+                component={Link} // Use Link component for navigation
+                to={`/${setting.toLowerCase()}`} // Link to page
+                onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}
