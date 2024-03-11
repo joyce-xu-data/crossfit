@@ -9,6 +9,9 @@ import Logs from './Logs';
 import Milestone from './Milestone';
 import Progress from './Progress';
 import Profile from './Profile';
+import BodyMetricsLogs from './BodyMetricsLogs'
+import BodyAnalysis from './BodyAnalysis'
+import Dashboard from './Dashboard'
 import { orange } from '@mui/material/colors';
 import { createTheme, ThemeProvider } from '@mui/material';
 
@@ -43,6 +46,9 @@ function App() {
               <Route path ="/Milestone" element ={<Milestone/>}> </Route>
               <Route path ="/Progress" element ={<Progress/>}> </Route>
               <Route path ="/Profile" element ={<Profile/>}> </Route>
+              <Route path ="/BodyMetricsLogs" element ={<BodyMetricsLogs/>}> </Route>
+              <Route path ="/BodyAnalysis" element ={<BodyAnalysis/>}> </Route>
+              <Route path ="/Dashboard" element ={<Dashboard/>}> </Route>
             
            
             </Routes>

@@ -5,6 +5,7 @@ import session from 'express-session';
 import pg from "pg";
 import usersRoutes from './routes/users.mjs';
 import workoutsRoutes from './routes/workouts.mjs'; 
+import bodyMetricsRoutes from './routes/bodyMetrics.mjs';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -46,6 +47,9 @@ app.use('/api/users', usersRoutes);
 app.use('/api/login', usersRoutes);
 app.use('/api/logs', authenticateToken, workoutsRoutes);
 app.use('/api/', workoutsRoutes);
+app.use('/api/', bodyMetricsRoutes);
+
+
 
 
 
@@ -63,5 +67,3 @@ app.use((error, req, res, next) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
-
-

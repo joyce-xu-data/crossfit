@@ -572,5 +572,3 @@ const handleFinalSubmit = () => {
   );
         }
 export default Logs;
-
-

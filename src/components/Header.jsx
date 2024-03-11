@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../images/logo.png';
 
-const pages = ['Logs', 'Milestone','Progress', 'Tools'];
+const pages = ['Logs', 'Milestone','Progress', 'Body Metrics Logs', 'Body Analysis','Tools'];
 const settings = ['Profile', 'Dashboard', 'Logout'];
 
 function Header() {
@@ -120,7 +120,7 @@ function Header() {
               <Button
                 key={page}
                 component={Link} // Use Link component for navigation
-                to={`/${page.toLowerCase()}`} // Link to page
+                to={`/${page.toLowerCase().replace(/\s+/g, '')}`} 
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
@@ -155,7 +155,7 @@ function Header() {
                 <MenuItem 
                 key={setting} 
                 component={Link} // Use Link component for navigation
-                to={`/${setting.toLowerCase()}`} // Link to page
+                to={`/${setting.toLowerCase().replace(/\s+/g, '')}`} // Link to page
                 onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>

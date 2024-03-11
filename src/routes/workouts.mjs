@@ -2,7 +2,6 @@ import express from 'express';
 import { db } from '../server.mjs';
 import { authenticateToken } from './authMiddleware.mjs';
 
-
 const router = express.Router();
 
 router.get('/categories',async (req, res) => {
