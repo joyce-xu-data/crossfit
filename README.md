@@ -22,24 +22,21 @@ Explore CrossFit Companion: The ultimate web app designed to assist beginners wi
 ### Administration
 - **Admin Dashboard:** A backend interface for site management.
 
-### Styling
-- **CSS Branding:** Consistent and responsive design across all pages.
-
 ### Support
 - **Chatbot:** Instant help for FAQs related to CrossFit (CF).
 
 ### Deployment
-- **Publish & Ship:** Steps for deploying the web app for public access.
+- **Publish & Ship:** 
 
 ### Additional Resources
 - **Merch Printing:** Option to order CrossFit merchandise.
 
 ## Getting Started
-Describe the steps to install, configure, and get the application running.
+
 
 ## Contributing
-Guidelines on how to contribute to the app development.
+
 
 ## License
-State the license under which this app is released.
+
 
