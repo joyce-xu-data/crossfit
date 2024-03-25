@@ -14,7 +14,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import logo from '../images/logo.png';
 
-const pages = ['Logs', 'Milestone','Progress', 'Body Metrics Logs', 'Body Analysis','Tools'];
+const pages = ['Logs', 'Milestone','Progress', 'Body Metrics Logs', 'Body Analysis','View All Body Metrics'];
 const settings = ['Profile', 'Dashboard', 'Logout'];
 
 function Header() {

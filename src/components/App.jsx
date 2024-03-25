@@ -11,6 +11,7 @@ import Progress from './Progress';
 import Profile from './Profile';
 import BodyMetricsLogs from './BodyMetricsLogs'
 import BodyAnalysis from './BodyAnalysis'
+import ViewAllBodyMetrics from './ViewAllBodyMetrics'
 import Dashboard from './Dashboard'
 import { orange } from '@mui/material/colors';
 import { createTheme, ThemeProvider } from '@mui/material';
@@ -48,6 +49,7 @@ function App() {
               <Route path ="/Profile" element ={<Profile/>}> </Route>
               <Route path ="/BodyMetricsLogs" element ={<BodyMetricsLogs/>}> </Route>
               <Route path ="/BodyAnalysis" element ={<BodyAnalysis/>}> </Route>
+              <Route path ="/ViewAllBodyMetrics" element ={<ViewAllBodyMetrics/>}> </Route>
               <Route path ="/Dashboard" element ={<Dashboard/>}> </Route>
             
            
